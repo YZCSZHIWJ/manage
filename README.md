@@ -17,3 +17,7 @@
 - jquery
 - bootstrap
 
+# 备注
+
+- 后天管理数据库模型已经放入到manage.sql文件中
+- 开发需要到WebContent/WEB-INF/applicationContext.xml文件中配置数据源
