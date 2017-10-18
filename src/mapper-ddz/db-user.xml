@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ddz.dao.UserDao">
+
+	<select id="getUserByUserid" resultType="User">
+		select userid, mobile, pwd,  qq, email, regtime, regip, lasttime, lastip, 
+			sign, imei, level, score, status
+		from tb_user
+		where userid = #{userid}
+	</select>
+	
+	<select id="getUserByMobile" resultType="User">
+		select userid, mobile, pwd,  qq, email, regtime, regip, lasttime, lastip, 
+			sign, imei, level, score, status
+		from tb_user
+		where mobile = #{mobile}
+	</select>
+
+	<select id="getUserAccount" resultType="Account">
+		select userid, money, gold, fmoney, today_income, today_expense, all_income, all_expense,
+			today_invite_income, discount
+		from tb_account 
+		where userid = #{userid}
+	</select>
+	
+	<select id="getUserBindList" resultType="java.util.HashMap">
+		select id, userid, account, bdtime, plat, sex, birthday, receiver, province,city, county, 
+			address, mobile, daynum, weeknum, mouthnum, daynum_flow, endtime, audit_img, creditlevel, level_status,
+		  	status, refuse_reason, audittime, auditadmin, hb_img, hb_time, hb_status, hb_audittime, hb_auditadmin, 
+		  	black_level, black_count, recaddr_status, recaddr_time, recaddr_admin, recaddr_reason
+		from tb_bind_buyuser
+		where userid = #{userid} 
+		order by plat asc, id asc 
+	</select>
+	
+	<select id="getUserBindBankList" resultType="java.util.HashMap">
+		select id, userid, type, bindaccount, cname, province, city, bankname, branchname, status, itime
+		from tb_bind_bank
+		where userid = #{userid} 
+	</select>
+	
+	<select id="getUserBindShopList" resultType="java.util.HashMap">
+		select id, userid, shopname, account, shopurl, plat, bdtime, province, city, county, address, status, 
+			limit_acc_shop, limit_buyer_shop, limit_buyer_seller, refuse_reason, freeze_reason, isselfback,
+			 isdianfutask, audit_time, audit_admin, revshop_status, revshop_time
+		from tb_bind_seller
+		where userid = #{userid}
+		order by plat, id
+	</select>
+	
+	<select id="countSmsSendNum" resultType="int">
+		select count(*) from tb_sms_send
+		<where>
+			<if test="userid != null">
+				userid = #{userid}
+			</if>		
+			<if test="mobile != null">
+				mobile = #{mobile}
+			</if>
+		</where>
+	</select>
+	
+	<select id="getSmsSendList" resultType="java.util.HashMap">
+		select id, userid, mobile, code, message, itime, endtime, errorcount, status, sendtime, type, sign, retmessage, imei, channel, usetime
+		from tb_sms_send
+		<where>
+			<if test="userid != null">
+				userid = #{userid}
+			</if>		
+			<if test="mobile != null">
+				mobile = #{mobile}
+			</if>
+		</where>
+		order by id desc limit #{firstPage}, #{pageSize}
+	</select>
+	
+	<select id="countMoneyDetailNum" resultType="int">
+		select count(*) from tb_account_money_detail
+		where userid = #{userid} 
+		<if test="search != null and search != ''"> and remark like concat('%', #{search}, '%') </if>
+	</select>
+	
+	<select id="getMoenyDetailLst" resultType="java.util.HashMap">
+		select id, userid, money, restmoney, type, itime, remark, opuser
+		from tb_account_money_detail
+		where userid = #{userid} 
+		<if test="search != null and search != ''"> and remark like concat('%', #{search}, '%') </if>
+		order by id desc limit #{firstPage}, #{pageSize}
+	</select>
+	
+	<select id="countGoldDetailNum" resultType="int">
+		select count(*) from tb_account_gold_detail 
+		where userid = #{userid} 
+		<if test="search != null and search != ''"> and remark like concat('%', #{search}, '%') </if>
+	</select>
+	
+	<select id="getGoldDetailLst" resultType="java.util.HashMap">
+		select id, userid, money, restmoney, type, itime, remark, opuser
+		from tb_account_gold_detail
+		where userid = #{userid} 
+		<if test="search != null and search != ''"> and remark like concat('%', #{search}, '%') </if>
+		order by id desc limit #{firstPage}, #{pageSize}
+	</select>
+	
+	<select id="countFmoneyDetailNum" resultType="int">
+		select count(*) from tb_account_fmoney_detail
+		where userid = #{userid} 
+		<if test="search != null and search != ''"> and remark like concat('%', #{search}, '%') </if>
+	</select>
+	
+	<select id="getFmoneyDetailLst" resultType="java.util.HashMap">
+		select id, userid, money, restmoney, type, itime, remark, opuser
+		from tb_account_fmoney_detail 
+		where userid = #{userid} 
+		<if test="search != null and search != ''"> and remark like concat('%', #{search}, '%') </if>
+		order by id desc limit #{firstPage}, #{pageSize}
+	</select>
+	
+	<insert id="addTest1">
+		insert into tb_z_test_1(name, age) values(#{name}, #{age})
+	</insert>
+	
+	<insert id="addTest2">
+		insert into tb_z_test_2(address) values(#{address})
+	</insert>
+	
+</mapper>

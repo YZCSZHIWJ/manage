@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.manage.dao.MasterDao">
+
+	<update id="freezeOrUnfreezeMaster"> 
+		update t_master set m_status = #{m_status} where m_id = #{m_id} 
+	</update>
+
+	<select id="getMasterByNameAndPwd" resultType="Master">
+		select m_id, m_name, m_pwd, m_cname, m_sex, m_birthday, m_mobile, m_qq, m_mail, m_ctime, m_cadmin, m_status, m_remark
+		from t_master 
+		where m_name = #{name} and m_pwd = #{pwd}
+	</select>
+	
+	<select id="getMasterById" resultType="Master">
+		select m_id, m_name, m_pwd, m_cname, m_sex, m_birthday, m_mobile, m_qq, m_mail, m_ctime, m_cadmin, m_status, m_remark
+		from t_master 
+		where m_id = #{id} 
+	</select>
+	
+	<select id="getAllMaster" resultType="Master">
+		select m_id, m_name, m_pwd, m_cname, m_sex, m_birthday, m_mobile, m_qq, m_mail, m_ctime, m_cadmin, m_status, m_remark
+		from t_master 
+		order by m_id
+	</select>
+	
+	<insert id="addMaster" parameterType="Master">
+		insert into t_master(m_name, m_pwd, m_cname, m_sex, m_birthday, m_mobile, m_qq, m_mail, m_ctime, m_cadmin, m_status, m_remark)
+		values(#{m_name}, #{m_pwd}, #{m_cname}, #{m_sex}, #{m_birthday}, #{m_mobile}, #{m_qq}, #{m_mail}, NOW(), #{m_cadmin}, 0, #{m_remark})
+	</insert>
+	
+	<update id="updateMaster" parameterType="Master">
+		update t_master set m_name = #{m_name}, m_pwd = #{m_pwd}, m_cname = #{m_cname}, m_mobile = #{m_mobile}, 
+			m_qq = #{m_qq}, m_mail = #{m_mail}, m_remark = #{m_remark}, m_cadmin = #{m_cadmin},
+			m_sex = #{m_sex}, m_birthday = #{m_birthday}, m_status = #{m_status}
+		where m_id = #{m_id}
+	</update>
+	
+	<delete id="delMaster">
+		delete from t_master where m_id = #{m_id}
+	</delete>
+	
+	<insert id="grantMasterFunc">
+		insert into t_master_function(m_id, f_id, mf_time, mf_user) values(#{m_id}, #{f_id}, NOW(), #{admin})
+	</insert>
+	
+	<delete id="removeMasterFunc">
+		delete from t_master_function where m_id = #{m_id} and f_id = #{f_id} 
+	</delete>
+	
+	<select id="getMasterHasFunctions" resultType="java.util.HashMap">
+		select t1.f_id, t1.mf_time, t1.mf_user, t2.f_name, t2.f_uri, t2.f_ctime, t2.f_cuser, t2.f_remark, t2.g_id
+		from t_master_function t1 left join t_func_list t2 on t1.f_id = t2.f_id 
+		where t1.m_id = #{m_id}
+	</select>
+	
+	<select id="getMastetNotHasFunctions" resultType="java.util.HashMap">
+		select t1.f_id, t1.g_id, t1.f_name, t1.f_uri, t1.f_ctime, t1.f_cuser, t1.f_remark
+		from t_func_list t1
+		where t1.f_id not in (select f_id from t_master_function where m_id = #{m_id})
+	</select>
+	
+	<delete id="removeMasterAllFunc">
+		delete from t_master_function where m_id = #{m_id}
+	</delete>
+	
+</mapper>

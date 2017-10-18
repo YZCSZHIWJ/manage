@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:beans="http://www.springframework.org/schema/beans"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.2.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+        ">
+    <!-- datasource config -->
+	<bean id="dataSource_manage" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<!-- access -->
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl" value="jdbc:mysql://115.159.224.136:3306/manage?useUnicode=true&amp;characterEncoding=UTF-8" />
+		<property name="user" value="rqw" />
+		<property name="password" value="renqiwang@666W#j" />
+		<!-- pool sizing -->
+		<property name="initialPoolSize" value="3" />
+		<property name="minPoolSize" value="10" />
+		<property name="maxPoolSize" value="200" />
+		<property name="acquireIncrement" value="7" />
+		<property name="maxStatements" value="0" />
+		<!-- retries -->
+		<property name="acquireRetryAttempts" value="30" />
+		<property name="acquireRetryDelay" value="1000" /> <!-- 1s -->
+		<property name="breakAfterAcquireFailure" value="false" />
+		<!-- refreshing connections -->
+		<property name="maxIdleTime" value="180" /> <!-- 3min -->
+		<property name="maxConnectionAge" value="10" /> <!-- 1h -->
+		<!-- timeouts and testing -->
+		<property name="checkoutTimeout" value="5000" /> <!-- 5s -->
+		<property name="idleConnectionTestPeriod" value="60" /> <!-- 60 -->
+		<property name="testConnectionOnCheckout" value="true" />
+		<property name="preferredTestQuery" value="SELECT 1" />
+        <property name="testConnectionOnCheckin" value="true" />
+	</bean>
+	<!-- sqlsession config -->
+	<bean id="sqlSessionFactory_manage" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource_manage"></property>
+		<property name="configLocation" value="classpath:mybatis-config.xml"></property>
+		<property name="typeAliasesPackage" value="com.manage.model"></property>
+		<property name="mapperLocations">
+			<array>
+				<value>classpath:mapper-core/*.xml</value>
+			</array>
+		</property>
+	</bean>
+	 
+	<!-- dao config -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">  
+        <property name="basePackage" value="com.manage.dao" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory_manage" />  
+    </bean>  
+    
+    <!-- transcation config -->
+ 	<bean id="transactionManager_manage" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    	<property name="dataSource" ref="dataSource_manage"></property>
+    	<qualifier value="manage" />
+    </bean>
+    <!-- 基于注解的声明式事务配置，默认使用注解来管理事务行为 -->
+    <tx:annotation-driven transaction-manager="transactionManager_manage" />
+    
+    <bean id="dataSource_ddz" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<!-- access -->
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl" value="jdbc:mysql://115.159.224.136:3306/ddz?useUnicode=true&amp;characterEncoding=UTF-8" />
+		<property name="user" value="rqw" />
+		<property name="password" value="renqiwang@666W#j" />
+		<!-- pool sizing -->
+		<property name="initialPoolSize" value="3" />
+		<property name="minPoolSize" value="10" />
+		<property name="maxPoolSize" value="200" />
+		<property name="acquireIncrement" value="7" />
+		<property name="maxStatements" value="0" />
+		<!-- retries -->
+		<property name="acquireRetryAttempts" value="30" />
+		<property name="acquireRetryDelay" value="1000" /> <!-- 1s -->
+		<property name="breakAfterAcquireFailure" value="false" />
+		<!-- refreshing connections -->
+		<property name="maxIdleTime" value="180" /> <!-- 3min -->
+		<property name="maxConnectionAge" value="10" /> <!-- 1h -->
+		<!-- timeouts and testing -->
+		<property name="checkoutTimeout" value="5000" /> <!-- 5s -->
+		<property name="idleConnectionTestPeriod" value="60" /> <!-- 60 -->
+		<property name="testConnectionOnCheckout" value="true" />
+		<property name="preferredTestQuery" value="SELECT 1" />
+        <property name="testConnectionOnCheckin" value="true" />
+	</bean>
+	
+    <bean id="sqlSessionFactory_ddz" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource_ddz"></property>
+		<property name="configLocation" value="classpath:mybatis-config.xml"></property>
+		<property name="typeAliasesPackage" value="com.ddz.model"></property>
+		<property name="mapperLocations">
+			<array>
+				<value>classpath:mapper-ddz/*.xml</value>
+			</array>
+		</property>
+	</bean>
+	
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">  
+        <property name="basePackage" value="com.ddz.dao" />
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory_ddz" />  
+    </bean> 
+    
+	<!-- transcation config -->
+    <bean id="transactionManager_ddz" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    	<property name="dataSource" ref="dataSource_ddz"></property>
+    	<qualifier value="ddz" />
+    </bean>
+    <!-- 基于注解的声明式事务配置，默认使用注解来管理事务行为 -->
+    <tx:annotation-driven transaction-manager="transactionManager_ddz" />
+    
+</beans>

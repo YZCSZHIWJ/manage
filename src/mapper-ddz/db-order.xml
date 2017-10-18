@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ddz.dao.OrderDao">
+	
+	<select id="countFlowOrderNum" resultType="int">
+		select count(*) from tb_buyer_order_flow
+		<where>
+			<if test="id > -1"> id = #{id} </if>
+			<if test="tid > -1"> and tid = #{tid} </if>
+			<if test="userid > -1"> and userid = #{userid} </if>
+			<if test="sellerid > -1"> and sellerid = #{sellerid} </if>
+			<if test="plat > -1"> and plat = #{plat} </if>
+			<if test="device > -1"> and device = #{device} </if>
+			<if test="status > -1"> and status = #{status} </if>
+			<if test="account != null and account != ''"> and account = #{account} </if>
+		</where>
+	</select>
+	
+	<select id="getFlowOrderLst" resultType="java.util.HashMap">
+		select id, userid, account, plat, device, shopname, selleraccount, sellerid, tid, pid, keyword_id, gname, gpic, 
+			gettime, endtime, commission, type, expirestime, ip, imei, status, autofinish_status, gid
+		from tb_buyer_order_flow
+		<where>
+			<if test="id > -1"> id = #{id} </if>
+			<if test="tid > -1"> and tid = #{tid} </if>
+			<if test="userid > -1"> and userid = #{userid} </if>
+			<if test="sellerid > -1"> and sellerid = #{sellerid} </if>
+			<if test="plat > -1"> and plat = #{plat} </if>
+			<if test="device > -1"> and device = #{device} </if>
+			<if test="status > -1"> and status = #{status} </if>
+			<if test="account != null and account != ''"> and account = #{account} </if>
+		</where>
+		order by id desc
+		limit #{firstPage}, #{pageSize}
+	</select>
+	
+	<select id="getFlowOrderDetail" resultType="java.util.HashMap">
+		select t1.id, t1.userid, t1.account, t1.plat, t1.device, t1.shopname, t1.selleraccount, t1.sellerid, t1.tid, t1.pid, 
+			t1.keyword_id, t1.gid, t1.gname, t1.gpic, t1.search_price, t1.gettime, t1.optime, t1.endtime, t1.commission, 
+			t1.screenshot_1, t1.screenshot_2, t1.type, t1.expirestime, t1.ip, t1.imei, t1.status, t1.autofinish_status, t1.special_type, 
+			t1.special_link, t1.searchkeyword, t2.keyword, t2.sortmsg, t2.position
+		from tb_buyer_order_flow t1 left join tb_seller_task_flow_keyword t2 on t2.keyword_id = t1.keyword_id 
+		where t1.id = #{id}
+	</select>
+	
+	<parameterMap type="java.util.HashMap" id="cancelFlowOrder_param">
+		<parameter property="i_id" javaType="java.lang.Long" jdbcType="BIGINT" mode="IN"/>
+		<parameter property="i_userid" javaType="java.lang.Long" jdbcType="BIGINT" mode="IN"/>
+		<parameter property="i_cancel_type" javaType="java.lang.Integer" jdbcType="INTEGER" mode="IN"/>
+		<parameter property="i_remark" javaType="java.lang.String" jdbcType="VARCHAR" mode="IN"/>
+		<parameter property="i_admin" javaType="java.lang.String" jdbcType="VARCHAR" mode="IN"/>
+		<parameter property="o_result" javaType="java.lang.Integer" jdbcType="INTEGER" mode="OUT"/>
+		<parameter property="o_msg" javaType="java.lang.String" jdbcType="VARCHAR" mode="OUT"/>
+	</parameterMap>
+	<update id="cancelFlowOrder" parameterMap="cancelFlowOrder_param" statementType="CALLABLE">
+		{call p_cancel_order_flow(?,?,?,?,?,?,?)}
+	</update>
+	
+	<select id="countCanceledFlowOrderNum" resultType="int">
+		select count(*) from tb_buyer_order_flow_expire
+		<where>
+			<if test="id > -1"> id = #{id} </if>
+			<if test="tid > -1"> and tid = #{tid} </if>
+			<if test="userid > -1"> and userid = #{userid} </if>
+			<if test="sellerid > -1"> and seller_userid = #{sellerid} </if>
+			<if test="plat > -1"> and plat = #{plat} </if>
+			<if test="device > -1"> and device = #{device} </if>
+			<if test="status > -1"> and status = #{status} </if>
+			<if test="account != null and account != ''"> and account = #{account} </if>
+		</where>
+	</select>
+	
+	<select id="getCanceledFlowOrderLst" resultType="java.util.HashMap">
+		select id, userid, account, plat, device, shopname, selleraccount, sellerid, tid, pid, keyword_id, gname, gpic, 
+			gettime, endtime, commission, type, expirestime, ip, imei, status, autofinish_status, gid
+		from tb_buyer_order_flow_expire
+		<where>
+			<if test="id > -1"> id = #{id} </if>
+			<if test="tid > -1"> and tid = #{tid} </if>
+			<if test="userid > -1"> and userid = #{userid} </if>
+			<if test="sellerid > -1"> and sellerid = #{sellerid} </if>
+			<if test="plat > -1"> and plat = #{plat} </if>
+			<if test="device > -1"> and device = #{device} </if>
+			<if test="status > -1"> and status = #{status} </if>
+			<if test="account != null and account != ''"> and account = #{account} </if>
+		</where>
+		order by id desc
+		limit #{firstPage}, #{pageSize}
+	</select>
+	
+	<select id="getCanceledFlowOrderDetail" resultType="java.util.HashMap">
+		select t1.id, t1.userid, t1.account, t1.plat, t1.device, t1.shopname, t1.selleraccount, t1.sellerid, t1.tid, t1.pid, 
+			t1.keyword_id, t1.gid, t1.gname, t1.gpic, t1.search_price, t1.gettime, t1.optime, t1.endtime, t1.commission, 
+			t1.screenshot_1, t1.screenshot_2, t1.type, t1.expirestime, t1.ip, t1.imei, t1.status, t1.autofinish_status, t1.special_type,  
+			t1.special_link, t1.searchkeyword, t1.cancel_remark, t1.cancel_time, t1.cancel_admin, t1.cancel_type, t1.is_reduce_task, 
+			t2.keyword, t2.sortmsg, t2.position
+		from tb_buyer_order_flow_expire t1 left join tb_seller_task_flow_keyword t2 on t2.keyword_id = t1.keyword_id 
+		where t1.id = #{id}
+	</select>
+	
+</mapper>

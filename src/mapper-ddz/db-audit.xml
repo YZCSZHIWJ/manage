@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ddz.dao.AuditDao">
+
+	<select id="countAuditIDCardNum" resultType="int">
+		select count(*) from tb_bind_idcard 
+		<where>
+			<if test="status > -1"> status = #{status} </if>
+			<if test="userid > -1"> and userid = #{userid} </if>
+			<if test="cname != null and cname != '' "> and cname = #{cname} </if>
+			<if test="cardno != null and cardno != '' "> and cardno = #{cardno} </if>
+		</where>
+	</select>
+	
+	<select id="getAuditIDCardLst" resultType="java.util.HashMap">
+		select userid, cname, cardno, cardpic, bdtime, reason, status, audittime, auditadmin
+		from tb_bind_idcard 
+		<where>
+			<if test="status > -1"> status = #{status} </if>
+			<if test="userid > -1"> and userid = #{userid} </if>
+			<if test="cname != null and cname != '' "> and cname = #{cname} </if>
+			<if test="cardno != null and cardno != '' "> and cardno = #{cardno} </if>
+		</where>
+		<if test="status == 0"> order by bdtime limit #{firstPage}, #{pageSize} </if>
+		<if test="status != 0"> order by audittime desc limit #{firstPage}, #{pageSize} </if>
+	</select>
+	
+	<update id="auditIdCard">
+		update tb_bind_idcard set status = #{status}, reason = #{reason}, audittime = NOW(), auditadmin = #{admin}
+		where userid = #{userid}
+	</update>
+	
+	<select id="countAuditBuyerAccNum" resultType="int">
+		select count(*) from tb_bind_buyuser
+		where plat = #{plat} and status = #{status} 
+		<if test="userid > -1"> and userid = #{userid} </if>
+	</select>
+	
+	<select id="getAuditBuyerAccLst" resultType="java.util.HashMap">
+		select id, userid, account, bdtime, plat, sex, birthday, receiver, province, city, county, address, mobile, audit_img, 
+			creditlevel, status, refuse_reason, audittime, auditadmin, hb_img, hb_time, hb_status, hb_audittime, hb_auditadmin
+		from tb_bind_buyuser
+		where plat = #{plat} and status = #{status} 
+		<if test="userid > -1"> and userid = #{userid} </if>
+		<if test="status == 0"> order by id asc </if>
+		<if test="status != 0"> order by audittime desc </if>
+		limit #{firstPage}, #{pageSize} 
+	</select>
+	
+	<update id="auditBuyerBindAcc">
+		update tb_bind_buyuser set status = #{status}, audittime = NOW(), auditadmin = #{admin}
+			<if test="status == 2"> , refuse_reason = #{reason}</if>
+		where id = #{id} and userid = #{userid} and status = 0 
+	</update>
+	
+	<select id="countAuditHbNum" resultType="int">
+		select count(*) from tb_bind_buyuser
+		where status = #{status} and hb_status = #{hb_status}
+		<if test="userid > -1"> and userid = #{userid} </if>
+	</select>
+	
+	<select id="getAuditHbLst" resultType="java.util.HashMap">
+		select t1.id, t1.userid, t1.account, t1.bdtime, t1.plat, t1.sex, t1.birthday, t1.receiver, t1.province, 
+			t1.city, t1.county, t1.address, t1.mobile, t1.audit_img, t1.creditlevel, t1.status, t1.refuse_reason, 
+			t1.audittime, t1.auditadmin, t1.hb_img, t1.hb_time, t1.hb_status, t1.hb_audittime, t1.hb_auditadmin,
+			t2.cname, t2.cardno, t2.cardpic, t2.status idcardstatus
+		from tb_bind_buyuser t1 left join tb_bind_idcard t2 on t1.userid = t2.userid 
+		where t1.status = #{status} and t1.hb_status = #{hb_status}
+		<if test="userid > -1"> and t1.userid = #{userid} </if>
+		<if test="status == 1"> order by t1.hb_time  </if>
+		<if test="status != 1"> order by t1.hb_audittime desc </if>
+		limit #{firstPage}, #{pageSize}
+	</select>
+	
+	<update id="auditHb">
+		update tb_bind_buyuser set hb_status = #{hb_status}, hb_audittime = NOW(), hb_auditadmin = #{admin}
+		<if test="hb_status == 3">, refuse_reason = #{reason} </if>
+		where id = #{id} and userid = #{userid} 
+	</update>
+	
+	<select id="countBindShopNum" resultType="int">
+		select count(*) from tb_bind_seller 
+		where status = #{status}
+		<if test="plat > -1"> and plat = #{plat} </if>
+		<if test="userid > -1"> and userid = #{userid} </if>
+		<if test="shopname != null and shopname != ''"> and shopname = #{shopname} </if>
+	</select> 
+	
+	<select id="getBindShopLst" resultType="java.util.HashMap">
+		select id, userid, plat, shopname, account, shopurl, shopimges, bdtime, province, city, county, address, status, 
+			limit_acc_shop, limit_buyer_shop, limit_buyer_seller, refuse_reason, freeze_reason, isselfback, isdianfutask,
+			audit_time, audit_admin, revshop_status, revshop_time
+		from tb_bind_seller
+		where status = #{status} 
+		<if test="plat > -1"> and plat = #{plat} </if>
+		<if test="userid > -1"> and userid = #{userid} </if>
+		<if test="shopname != null and shopname != ''"> and shopname = #{shopname} </if>
+		<if test="status == 0"> order by id  </if>
+		<if test="status != 0"> order by audit_time desc </if>
+		limit #{firstPage}, #{pageSize}
+	</select>
+	
+	<update id="auditBindShop">
+		update tb_bind_seller set status = #{status}, audit_time = NOW(), audit_admin = #{admin}
+		<if test="status == 2"> , refuse_reason = #{reason} </if>
+		where id = #{id} and userid = #{userid} 
+	</update>
+	
+	<parameterMap type="java.util.HashMap" id="auditFlowTask_param">
+		<parameter property="i_id" javaType="java.lang.Long" jdbcType="BIGINT" mode="IN"/>
+		<parameter property="i_userid" javaType="java.lang.Long" jdbcType="BIGINT" mode="IN"/>
+		<parameter property="i_status" javaType="java.lang.Integer" jdbcType="INTEGER" mode="IN"/>
+		<parameter property="i_reason" javaType="java.lang.String" jdbcType="VARCHAR" mode="IN"/>
+		<parameter property="i_admin" javaType="java.lang.String" jdbcType="VARCHAR" mode="IN"/>
+		<parameter property="o_result" javaType="java.lang.Integer" jdbcType="INTEGER" mode="OUT"/>
+		<parameter property="o_msg" javaType="java.lang.String" jdbcType="VARCHAR" mode="OUT"/>
+	</parameterMap>
+	<update id="auditFlowTask" parameterMap="auditFlowTask_param" statementType="CALLABLE">
+		{call p_admin_audit_task_flow(?,?,?,?,?,?,?)}
+	</update>
+	
+</mapper>

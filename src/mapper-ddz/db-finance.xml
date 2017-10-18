@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.ddz.dao.FinanceDao">
+
+	<select id="getMoneyReqNum" resultType="int">
+		select count(*) from tb_getmoney_req
+		where status = #{status}
+		<if test="userid > -1"> and userid = #{userid} </if>
+		<if test="isout > -1"> and isout = #{isout} </if>
+		<if test="last4 != null and last4 != ''"> and bankaccount like concat("%", #{last4}) </if>
+		<if test="starttime != null and starttime != ''"> and itime >= #{starttime} </if>
+		<if test="endtime != null and endtime != ''"> and DATE_ADD(#{endtime}, interval 1 day) > itime </if>
+	</select>
+	
+	<select id="getMoneyReqLst" resultType="java.util.HashMap">
+		select id, userid, type, money, price, restmoney, status, itime, cname, bankname, bankaccount, province, city, audittime,
+			auditadmin, reason, isout, batch_number
+		from tb_getmoney_req
+		where status = #{status}
+		<if test="userid > -1"> and userid = #{userid} </if>
+		<if test="last4 != null and last4 != ''"> and bankaccount like concat("%", #{last4}) </if>
+		<if test="isout > -1"> and isout = #{isout} </if>
+		<if test="starttime != null and starttime != ''"> and itime >= #{starttime} </if>
+		<if test="endtime != null and endtime != ''"> and DATE_ADD(#{endtime}, interval 1 day) > itime </if>
+		<if test="status == 0"> order by itime  </if>
+		<if test="status > 0"> order by audittime desc</if>
+		limit #{firstPage}, #{pageSize}
+	</select>
+	
+</mapper>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ddz.dao.TaskDao">
+
+	<select id="countFlowTaskNum" resultType="int">
+		select count(*) from tb_seller_task_flow 
+		where paystatus = 1 and status = #{status} 
+		<if test="id > -1"> and id = #{id}</if>
+		<if test="userid > -1"> and userid = #{userid}</if>
+		<if test="plat > -1"> and plat = #{plat}</if>
+	</select>
+	
+	<select id="getFlowTaskLst" resultType="java.util.HashMap">
+		select t1.id, t1.userid, t1.account, t1.shopname, t1.plat, t1.bindsellerid, t1.device, t1.gname, t1.glink, t1.gpic, t1.gid, t1.price, t1.search_price, 
+			t1.minprice, t1.maxprice, t1.city, t1.special_type, t1.special_link, t1.itime, t1.add_commission, t1.issetime, t1.status, t1.paystatus, 
+			t1.paytime, t1.all_count, t1.get_count, t1.waitdo_count, t1.waitsure_count, t1.end_count, t1.cancel_count, t1.brother_tid, t1.freezeadmin,
+			t1.expirestime, t1.remark, t1.remark_img, t1.nopassreason, t1.auditadmin, t1.audittime, t1.freezereason, t1.freezetime, t1.isfree, t1.endtime,
+			t1.searchkeyword, t1.isfavtask, t2.limit_acc_shop, t2.limit_buyer_shop, t2.limit_buyer_seller, t2.is_limit_province, t2.limit_province,
+			t2.is_limit_tblevel, t2.is_limit_sex, t2.is_limit_age, t2.is_limit_hb, t2.is_add, t3.interval_minute, t3.interval_num, t3.startdate ts_startdate,
+			t3.starttime ts_starttime, t3.endtime ts_endtime
+		from tb_seller_task_flow t1 inner join tb_seller_task_flow_limit t2 on t1.id = t2.tid left join tb_seller_task_flow_timeset t3 on t1.id = t3.tid
+		where t1.paystatus = 1 and t1.status = #{status} 
+		<if test="id > -1"> and t1.id = #{id}</if>
+		<if test="userid > -1"> and t1.userid = #{userid}</if>
+		<if test="plat > -1"> and t1.plat = #{plat}</if>
+		<if test="status == 0"> order by t1.paytime </if>
+		<if test="status != 0"> order by t1.audittime </if>
+		limit #{firstPage}, #{pageSize}
+	</select> 
+	
+	<select id="getFlowTaskDetail" resultType="java.util.HashMap">
+		select t1.id, t1.userid, t1.account, t1.shopname, t1.plat, t1.bindsellerid, t1.device, t1.gname, t1.glink, t1.gpic, t1.gid, t1.price, t1.search_price, 
+			t1.minprice, t1.maxprice, t1.city, t1.special_type, t1.special_link, t1.itime, t1.add_commission, t1.issetime, t1.status, t1.paystatus, 
+			t1.paytime, t1.all_count, t1.get_count, t1.waitdo_count, t1.waitsure_count, t1.end_count, t1.cancel_count, t1.brother_tid, t1.freezeadmin,
+			t1.expirestime, t1.remark, t1.remark_img, t1.nopassreason, t1.auditadmin, t1.audittime, t1.freezereason, t1.freezetime, t1.isfree, t1.endtime,
+			t1.searchkeyword, t1.isfavtask
+		from tb_seller_task_flow t1 
+		where id = #{id}
+	</select>
+	
+	<select id="getFlowTaskLimit" resultType="java.util.HashMap">
+		select tid, userid, limit_acc_shop, limit_buyer_shop, limit_buyer_seller, is_limit_province, limit_province, is_limit_tblevel,
+			is_limit_sex, is_limit_age, is_limit_hb, is_add
+		from tb_seller_task_flow_limit 
+		where tid = #{id}
+	</select>
+	
+	<select id="getFlowTaskTimeSet" resultType="java.util.HashMap">
+		select tid, userid, interval_minute, interval_num, itime, status, startdate, starttime, endtime, canrelease, nexttime, lasttime
+		from tb_seller_task_flow_timeset
+		where tid = #{id}
+	</select>
+	
+	<select id="getFlowTaskPay" resultType="java.util.HashMap">
+		select id, tid, userid, allcount, waitcount, getcount, endcount, type, itime, paystatus, paytime, base_commission, 
+			add_commission, other_commission, user_get_commission, sys_get_commission, all_commission
+		from tb_seller_task_flow_pay
+		where tid = #{id}
+	</select>
+	
+	<select id="getFlowTaskKeywordes" resultType="java.util.HashMap">
+		select keyword_id, tid, pid, keyword, count, getcount, fav_message, sortmsg, position
+		from tb_seller_task_flow_keyword
+		where tid = #{id}
+	</select>
+	
+	<select id="countAuditedFlowTaskNum" resultType="int">
+		select count(*) from tb_seller_task_flow
+		where paystatus = 1 and status > 0 
+			<if test="id > -1"> and id = #{id} </if>
+			<if test="userid > -1"> and userid = #{userid} </if>
+			<if test="plat > -1"> and plat = #{plat} </if>
+			<if test="progress == 0"> and (all_count - get_count) > 0  </if>
+			<if test="progress == 1"> and waitdo_count > 0 </if>
+			<if test="progress == 2"> and waitsure_count > 0 </if>
+			<if test="progress == 3"> and end_count > 0 </if>
+	</select>
+	
+	<select id="getAuditedFlowTaskLst" resultType="java.util.HashMap">
+		select t1.id, t1.userid, t1.account, t1.shopname, t1.plat, t1.bindsellerid, t1.device, t1.gname, t1.glink, t1.gpic, t1.gid, t1.price, t1.search_price, 
+			t1.minprice, t1.maxprice, t1.city, t1.special_type, t1.special_link, t1.itime, t1.add_commission, t1.issetime, t1.status, t1.paystatus, 
+			t1.paytime, t1.all_count, t1.get_count, t1.waitdo_count, t1.waitsure_count, t1.end_count, t1.cancel_count, t1.brother_tid, t1.freezeadmin,
+			t1.expirestime, t1.remark, t1.remark_img, t1.nopassreason, t1.auditadmin, t1.audittime, t1.freezereason, t1.freezetime, t1.isfree, t1.endtime,
+			t1.searchkeyword, t1.isfavtask
+		from tb_seller_task_flow t1 
+		where paystatus = 1 and status > 0 
+			<if test="id > -1"> and id = #{id} </if>
+			<if test="userid > -1"> and userid = #{userid} </if>
+			<if test="plat > -1"> and plat = #{plat} </if>
+			<if test="progress == 0"> and (all_count - get_count) > 0  </if>
+			<if test="progress == 1"> and waitdo_count > 0 </if>
+			<if test="progress == 2"> and waitsure_count > 0 </if>
+			<if test="progress == 3"> and end_count > 0 </if>
+		order by id desc 
+		limit #{firstPage}, #{pageSize}
+	</select>
+	
+</mapper>

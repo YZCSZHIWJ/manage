@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.manage.dao.SystemDao">
+	
+	<insert id="addLoginLog">
+		insert into t_login_log(m_id, log_ip, log_time) values(#{m_id}, #{ip}, NOW())
+	</insert>
+	
+	<insert id="addVisiteLog">
+		insert into t_master_visite_log(m_id, m_name, v_url, v_time, ip) values(#{m_id}, #{m_name}, #{url}, NOW(), #{ip})
+	</insert>
+	
+	<resultMap type="java.util.HashMap" id="MasterLoginLogResult">  
+       <result column="id" property="id" javaType="java.lang.Long" jdbcType="BIGINT"/>  
+       <result column="m_id" property="m_id" javaType="java.lang.Integer" jdbcType="INTEGER"/>  
+       <result column="log_ip" property="log_ip" javaType="java.lang.String" jdbcType="VARCHAR"/>  
+       <result column="log_time" property="log_time" javaType="java.lang.String" jdbcType="VARCHAR"/>  
+    </resultMap>  
+    
+    <parameterMap type="java.util.HashMap" id="MasterLoginLogParam">
+    	<parameter property="i_m_id" javaType="int" jdbcType="INTEGER" mode="IN"/>
+    	<parameter property="o_n" javaType="int" jdbcType="INTEGER" mode="OUT"/>
+    </parameterMap>
+       
+    <select id="getMasterLoginLogList" parameterMap="MasterLoginLogParam" 
+    	resultMap="MasterLoginLogResult" statementType="CALLABLE">
+      {call p_login_log(?,?)}
+    </select>
+    
+    <insert id="addToTestTb">
+    	insert into tb_test(name) values(#{name})
+    </insert>
+</mapper>

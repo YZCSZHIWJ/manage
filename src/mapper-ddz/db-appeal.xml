@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <mapper namespace="com.ddz.dao.AppealDao">
+ 
+ 	<select id="countAppealNum" resultType="int">
+ 		select count(*) from tb_appeal_main
+ 		where 
+ 		<if test="status != 2"> status in (0,1) </if>
+ 		<if test="status == 2"> status = #{status} </if>
+ 		<if test="orderid > -1"> and orderid = #{orderid} </if>
+ 		<if test="userid > -1"> and userid = #{userid} </if>
+ 		<if test="beuserid > -1"> and beuserid = #{beuserid} </if>
+ 		<if test="appeal_type > -1"> and appeal_type = #{appeal_type} </if>
+ 		<if test="plat_join_status > -1"> and plat_join_status = #{plat_join_status} </if>
+ 		<if test="starttime != null and starttime != ''"> and itime >= #{starttime} </if>
+ 		<if test="endtime != null and endtime != ''"> and DATE_ADD(#{endtime}, INTERVAL 1 DAY) > itime </if>
+ 	</select>
+ 	
+ 	<select id="getAppealLst" resultType="java.util.HashMap">
+ 		select orderid, isflow, is_refundtype, is_limit_back, tid, userid, beuserid, appeal_type, appeal_imges, appeal_reason, gpic, status, 
+ 			itime, plat_join_status, user_back_status, beuser_back_status, appeal_times, overtime, overadmin, admin_read_status, last_back_admin,
+ 			last_admin_back_content, last_admin_back_time, apply_join_user, apply_join_time, cancel_order_status, cancel_order_reason, apply_cancel_user,
+ 			apply_cancel_time, accept_cancel_user, accept_cancel_time
+ 		from tb_appeal_main 
+ 		where 
+ 		<if test="status != 2"> status in (0,1) </if>
+ 		<if test="status == 2"> status = #{status} </if>
+ 		<if test="orderid > -1"> and orderid = #{orderid} </if>
+ 		<if test="userid > -1"> and userid = #{userid} </if>
+ 		<if test="beuserid > -1"> and beuserid = #{beuserid} </if>
+ 		<if test="appeal_type > -1"> and appeal_type = #{appeal_type} </if>
+ 		<if test="plat_join_status > -1"> and plat_join_status = #{plat_join_status} </if>
+ 		<if test="starttime != null and starttime != ''"> and itime >= #{starttime} </if>
+ 		<if test="endtime != null and endtime != ''"> and DATE_ADD(#{endtime}, INTERVAL 1 DAY) > itime </if>
+ 		<if test="1 > plat_join_status "> order by itime asc </if>
+ 		<if test="plat_join_status == 1"> order by apply_join_time asc </if>
+ 		limit #{firstPage}, #{pageSize}
+ 	</select>
+ 	
+ 	<select id="getAppealMain" resultType="java.util.HashMap">
+ 		select orderid, isflow, is_refundtype, is_limit_back, tid, userid, beuserid, appeal_type, appeal_imges, appeal_reason, gpic, status, 
+ 			itime, plat_join_status, user_back_status, beuser_back_status, appeal_times, overtime, overadmin, admin_read_status, last_back_admin,
+ 			last_admin_back_content, last_admin_back_time, apply_join_user, apply_join_time, cancel_order_status, cancel_order_reason, apply_cancel_user,
+ 			apply_cancel_time, accept_cancel_user, accept_cancel_time
+ 		from tb_appeal_main 
+ 		where orderid = #{orderid} and isflow = #{isflow} 
+ 	</select>
+ 	
+ 	<parameterMap type="java.util.HashMap" id="backAppeal_param">
+ 		<parameter property="i_orderid" javaType="java.lang.Long" jdbcType="BIGINT" mode="IN"/>
+ 		<parameter property="i_isflow" javaType="java.lang.Integer" jdbcType="INTEGER" mode="IN"/>
+ 		<parameter property="i_userid" javaType="java.lang.Long" jdbcType="BIGINT" mode="IN"/>
+ 		<parameter property="i_beuserid" javaType="java.lang.Long" jdbcType="BIGINT" mode="IN"/>
+ 		<parameter property="i_appeal_type" javaType="java.lang.Integer" jdbcType="INTEGER" mode="IN"/>
+ 		<parameter property="i_appeal_imges" javaType="java.lang.String" jdbcType="VARCHAR" mode="IN"/>
+ 		<parameter property="i_appeal_reason" javaType="java.lang.String" jdbcType="VARCHAR" mode="IN"/>
+ 		<parameter property="i_admin" javaType="java.lang.String" jdbcType="VARCHAR" mode="IN"/>
+ 		<parameter property="o_result" javaType="java.lang.Integer" jdbcType="INTEGER" mode="OUT"/>
+ 		<parameter property="o_msg" javaType="java.lang.String" jdbcType="VARCHAR" mode="OUT"/>
+ 	</parameterMap>
+ 	<insert id="backAppeal" parameterMap="backAppeal_param" statementType="CALLABLE">
+ 		{call p_appeal_add_back(?,?,?,?,?,?,?,?,?,?)}
+ 	</insert>
+ 	
+ 	<update id="overAppeal">
+ 		update tb_appeal_main set status = 2, overtime = NOW(), overadmin = #{admin} 
+ 		where orderid = #{orderid} and isflow = #{isflow}
+ 	</update>
+ 	
+ 	<select id="getAppealContent" resultType="java.util.HashMap">
+		select id, orderid, isflow, userid, content, DATE_FORMAT(itime, '%Y-%m-%d %H:%i:%s') itime, role, admin, cancel_order_status,
+			DATE_FORMAT(launchtime, '%Y-%m-%d %H:%i:%s') launchtime
+		from tb_appeal_sub 
+		where orderid = #{orderid} and isflow = #{isflow}
+ 	</select>
+ 	
+ </mapper>
