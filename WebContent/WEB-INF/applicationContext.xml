@@ -18,9 +18,9 @@
 	<bean id="dataSource_manage" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
 		<!-- access -->
 		<property name="driverClass" value="com.mysql.jdbc.Driver" />
-		<property name="jdbcUrl" value="jdbc:mysql://115.159.224.136:3306/manage?useUnicode=true&amp;characterEncoding=UTF-8" />
-		<property name="user" value="rqw" />
-		<property name="password" value="renqiwang@666W#j" />
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/manage?useUnicode=true&amp;characterEncoding=UTF-8" />
+		<property name="user" value="user" />
+		<property name="password" value="pass" />
 		<!-- pool sizing -->
 		<property name="initialPoolSize" value="3" />
 		<property name="minPoolSize" value="10" />
@@ -70,9 +70,9 @@
     <bean id="dataSource_ddz" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
 		<!-- access -->
 		<property name="driverClass" value="com.mysql.jdbc.Driver" />
-		<property name="jdbcUrl" value="jdbc:mysql://115.159.224.136:3306/ddz?useUnicode=true&amp;characterEncoding=UTF-8" />
-		<property name="user" value="rqw" />
-		<property name="password" value="renqiwang@666W#j" />
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/ddz?useUnicode=true&amp;characterEncoding=UTF-8" />
+		<property name="user" value="user" />
+		<property name="password" value="pass" />
 		<!-- pool sizing -->
 		<property name="initialPoolSize" value="3" />
 		<property name="minPoolSize" value="10" />
